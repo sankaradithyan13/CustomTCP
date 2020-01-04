@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<test lab="lab3_part1">
+
+<description>
+    Tests CTCP on a dumbbell mininet topology
+    - downloading binary files from across a lossy link
+    - concurrent downloads across a bottleneck link
+    - check for memory leaks
+    As always, if you want to stop after the first failure,
+    use the -f flag with generic_tester.py.
+</description>
+
+<!-- Clean up the environment  -->
+<init>
+  <run_command>killall ovs-controller</run_command>
+  <run_command>mn -c</run_command>
+  <run_command>killall ctcp</run_command>
+</init>
+
+<test_cases>
+  <!-- Single server to client -->
+  <cget points="20" file="ctcp">client1!8888:server1!19999</cget>
+  <!-- Single server to client with a 5% loss rate-->
+  <cget points="30" file="ctcp" loss="5 router1:router2" window="10">client1!8883:server1!19993</cget>
+  <!-- Two concurrent client-server downloads -->
+  <cget points="40" file="ctcp">client1!8887:server1!19997 client2!8886:server2!19996</cget>
+  <!-- Two concurrent client-server downloads with a 5% loss rate-->
+  <cget points="50" file="ctcp" loss="5 router1:router2">client1!8885:server1!19995 client2!8884:server2!19994</cget>
+  <!-- Check for memory leaks -->
+  <cget points="10" memcheck="/tmp/ctcp_valgrind" file="ctcp">client1!8888:server1!19999</cget>
+</test_cases>
+
+</test>
